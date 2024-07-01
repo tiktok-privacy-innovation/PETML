@@ -1,0 +1,7 @@
+[run]
+concurrency=multiprocessing
+include =
+    petml/*
+omit =
+    tests/*
+    petml/infra/abc/*
