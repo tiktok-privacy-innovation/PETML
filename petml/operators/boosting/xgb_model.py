@@ -55,7 +55,7 @@ class XGBoostClassifierFit(OperatorBase):
                     "train_data": "/path/to/data.csv",
                 },
                 "outputs": {
-                    "model_path": "/path/to/model_name.pkl"
+                    "model_path": "/path/to/model_name.json"
                 }
             },
             "party_b": {
@@ -63,7 +63,7 @@ class XGBoostClassifierFit(OperatorBase):
                     "train_data": "/path/to/data.csv",
                 },
                 "outputs": {
-                    "model_path": "/path/to/model_name.pkl"
+                    "model_path": "/path/to/model_name.json"
                 }
             }
         }
@@ -88,8 +88,8 @@ class XGBoostClassifierFit(OperatorBase):
         train_data = CsvStorage.read(configs["inputs"]["train_data"])
         model_path = configs["outputs"]["model_path"]
         ext = Path(model_path)
-        if ext.suffix != '.pkl':
-            raise ValueError('The `model_path` should end with the `.pkl` format.')
+        if ext.suffix != '.json':
+            raise ValueError('The `model_path` should end with the `.json` format.')
 
         # construct model
         model = XGBoostClassifier(min_split_loss,
@@ -133,7 +133,7 @@ class XGBoostClassifierPredict(OperatorBase):
             "party_a": {
                 "inputs": {
                     "predict_data": "/path/to/data.csv",
-                    "model_path": "/path/to/model_name.pkl"
+                    "model_path": "/path/to/model_name.json"
                 },
                 "outputs": {
                     "inference_res_path": "pathto/predict_proba_value.csv"
@@ -142,7 +142,7 @@ class XGBoostClassifierPredict(OperatorBase):
             "party_b": {
                "inputs": {
                     "predict_data": "/path/to/data.csv",
-                    "model_path": "/path/to/model_name.pkl"
+                    "model_path": "/path/to/model_name.json"
                 },
                 "outputs": {
                     "inference_res_path": "/path/to/predict_proba_value.csv"
@@ -157,8 +157,8 @@ class XGBoostClassifierPredict(OperatorBase):
         predict_data = CsvStorage.read(configs["inputs"]["predict_data"])
         model_path = configs["inputs"]["model_path"]
         ext = Path(model_path)
-        if ext.suffix != '.pkl':
-            raise ValueError('The `model_path` should end with the `.pkl` format.')
+        if ext.suffix != '.json':
+            raise ValueError('The `model_path` should end with the `.json` format.')
         inference_res_path = configs["outputs"]["inference_res_path"]
 
         # inference model
@@ -205,7 +205,7 @@ class XGBoostRegressorFit(OperatorBase):
                     "train_data": "/path/to/data.csv",
                 },
                 "outputs": {
-                    "model_path": "/path/to/model_name.pkl"
+                    "model_path": "/path/to/model_name.json"
                 }
             },
             "party_b": {
@@ -213,7 +213,7 @@ class XGBoostRegressorFit(OperatorBase):
                     "train_data": "/path/to/data.csv",
                 },
                 "outputs": {
-                    "model_path": "/path/to/model_name.pkl"
+                    "model_path": "/path/to/model_name.json"
                 }
             }
         }
@@ -238,8 +238,8 @@ class XGBoostRegressorFit(OperatorBase):
         train_data = CsvStorage.read(configs["inputs"]["train_data"])
         model_path = configs["outputs"]["model_path"]
         ext = Path(model_path)
-        if ext.suffix != '.pkl':
-            raise ValueError('The `model_path` should end with the `.pkl` format.')
+        if ext.suffix != '.json':
+            raise ValueError('The `model_path` should end with the `.json` format.')
 
         # construct model
         model = XGBoostRegressor(min_split_loss,
@@ -283,7 +283,7 @@ class XGBoostRegressorPredict(OperatorBase):
             "party_a": {
                 "inputs": {
                     "predict_data": "/path/to/data.csv",
-                    "model_path": "/path/to/model_name.pkl"
+                    "model_path": "/path/to/model_name.json"
                 },
                 "outputs": {
                     "inference_res_path": "/path/to/predict_value.csv"
@@ -292,7 +292,7 @@ class XGBoostRegressorPredict(OperatorBase):
             "party_b": {
                "inputs": {
                     "predict_data": "/path/to/data.csv",
-                    "model_path": "/path/to/model_name.pkl"
+                    "model_path": "/path/to/model_name.json"
                 }
                 "outputs": {
                     "inference_res_path": "path/to/predict_value.csv"
@@ -307,8 +307,8 @@ class XGBoostRegressorPredict(OperatorBase):
         predict_data = CsvStorage.read(configs["inputs"]["predict_data"])
         model_path = configs["inputs"]["model_path"]
         ext = Path(model_path)
-        if ext.suffix != '.pkl':
-            raise ValueError('The `model_path` should end with the `.pkl` format.')
+        if ext.suffix != '.json':
+            raise ValueError('The `model_path` should end with the `.json` format.')
         inference_res_path = configs["outputs"]["inference_res_path"]
 
         # inference model

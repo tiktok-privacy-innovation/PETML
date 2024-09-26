@@ -60,7 +60,7 @@ class TestXGBoostClassifier:
                     "train_data": "examples/data/iris_binary_mini_server.csv",
                 },
                 "outputs": {
-                    "model_path": "tmp/test_binary_xgb_server.pkl"
+                    "model_path": "tmp/test_binary_xgb_server.json"
                 }
             },
             "party_b": {
@@ -68,7 +68,7 @@ class TestXGBoostClassifier:
                     "train_data": "examples/data/iris_binary_mini_client.csv",
                 },
                 "outputs": {
-                    "model_path": "tmp/test_binary_xgb_client.pkl"
+                    "model_path": "tmp/test_binary_xgb_client.json"
                 }
             }
         }
@@ -88,7 +88,7 @@ class TestXGBoostClassifier:
             "party_a": {
                 "inputs": {
                     "predict_data": "examples/data/iris_binary_mini_server.csv",
-                    "model_path": "tmp/test_binary_xgb_server.pkl"
+                    "model_path": "tmp/test_binary_xgb_server.json"
                 },
                 "outputs": {
                     "inference_res_path": "tmp/test_binary_predict_server.csv"
@@ -97,7 +97,7 @@ class TestXGBoostClassifier:
             "party_b": {
                 "inputs": {
                     "predict_data": "examples/data/iris_binary_mini_client.csv",
-                    "model_path": "tmp/test_binary_xgb_client.pkl"
+                    "model_path": "tmp/test_binary_xgb_client.json"
                 },
                 "outputs": {
                     "inference_res_path": "tmp/test_binary_predict_client.csv"
@@ -159,7 +159,7 @@ class TestXGBoostRegressor:
                     "train_data": "examples/data/students_reg_mini_server.csv",
                 },
                 "outputs": {
-                    "model_path": "tmp/test_reg_xgb_server.pkl"
+                    "model_path": "tmp/test_reg_xgb_server.json"
                 }
             },
             "party_b": {
@@ -167,7 +167,7 @@ class TestXGBoostRegressor:
                     "train_data": "examples/data/students_reg_mini_client.csv",
                 },
                 "outputs": {
-                    "model_path": "tmp/test_reg_xgb_client.pkl"
+                    "model_path": "tmp/test_reg_xgb_client.json"
                 }
             }
         }
@@ -187,7 +187,7 @@ class TestXGBoostRegressor:
             "party_a": {
                 "inputs": {
                     "predict_data": "examples/data/students_reg_mini_server.csv",
-                    "model_path": "tmp/test_reg_xgb_server.pkl"
+                    "model_path": "tmp/test_reg_xgb_server.json"
                 },
                 "outputs": {
                     "inference_res_path": "tmp/test_reg_predict_server.csv"
@@ -196,7 +196,7 @@ class TestXGBoostRegressor:
             "party_b": {
                 "inputs": {
                     "predict_data": "examples/data/students_reg_mini_client.csv",
-                    "model_path": "tmp/test_reg_xgb_client.pkl"
+                    "model_path": "tmp/test_reg_xgb_client.json"
                 },
                 "outputs": {
                     "inference_res_path": "tmp/test_reg_predict_client.csv"

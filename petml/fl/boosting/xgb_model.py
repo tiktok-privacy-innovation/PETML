@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import hashlib
-import pickle
+import json
 import time
 
 import numpy as np
@@ -366,35 +366,43 @@ class BaseXGB(FlBase):
 
         return tree, y_hat, eval_y_hat
 
+    @staticmethod
+    def export_share(share_value) -> list:
+        return share_value.to_share().astype(np.int64).tolist()
+
+    @staticmethod
+    def load_share(load_data):
+        return snp.fromshare(np.array(load_data).astype(np.int64), np.float64)
+
     def save_tree_from_ss_to_numpy(self, trees):
         for tree in trees:
-            tree.columns = tree.columns.to_share().astype(np.int64)
+            tree.columns = self.export_share(tree.columns)
             self._save_tree_from_ss_to_numpy(tree.root)
 
     def _save_tree_from_ss_to_numpy(self, tree_node):
         """Convert secure object to numerical value"""
         if tree_node.is_leaf:
-            tree_node.leaf_weight = tree_node.leaf_weight.to_share().astype(np.int64)
+            tree_node.leaf_weight = self.export_share(tree_node.leaf_weight)
             return
 
-        tree_node.split_feat = tree_node.split_feat.to_share().astype(np.int64)
-        tree_node.split_val = tree_node.split_val.to_share().astype(np.int64)
+        tree_node.split_feat = self.export_share(tree_node.split_feat)
+        tree_node.split_val = self.export_share(tree_node.split_val)
         self._save_tree_from_ss_to_numpy(tree_node.left_child)
         self._save_tree_from_ss_to_numpy(tree_node.right_child)
 
     def load_tree_from_numpy_to_ss(self, trees):
         for tree in trees:
-            tree.columns = snp.fromshare(tree.columns, np.float64)
+            tree.columns = self.load_share(tree.columns)
             self._load_tree_from_numpy_to_ss(tree.root)
 
     def _load_tree_from_numpy_to_ss(self, tree_node):
         """Convert to secure object from numerical value"""
         if tree_node.is_leaf:
-            tree_node.leaf_weight = snp.fromshare(tree_node.leaf_weight, np.float64)
+            tree_node.leaf_weight = self.load_share(tree_node.leaf_weight)
             return
 
-        tree_node.split_feat = snp.fromshare(tree_node.split_feat, np.float64)
-        tree_node.split_val = snp.fromshare(tree_node.split_val, np.float64)
+        tree_node.split_feat = self.load_share(tree_node.split_feat)
+        tree_node.split_val = self.load_share(tree_node.split_val)
         self._load_tree_from_numpy_to_ss(tree_node.left_child)
         self._load_tree_from_numpy_to_ss(tree_node.right_child)
 
@@ -501,6 +509,30 @@ class XGBoostClassifier(BaseXGB):
         self.eval_threshold = eval_threshold
         self.trees = []
         self.loss_func = LogisticLoss()
+
+    def to_dict(self):
+        result = vars(self).copy()
+        del result['logger']
+        result['trees'] = [tree.to_dict() for tree in self.trees]
+        result['loss_func'] = self.loss_func.to_dict()
+        return result
+
+    @classmethod
+    def from_dict(cls, data):
+        obj = cls()
+        for k, v in data.items():
+            if k == 'trees':
+                setattr(obj, k, [MPCTree.from_dict(tree_dict) for tree_dict in v])
+            elif k == 'loss_func':
+                loss_map = {
+                    'LogisticLoss': LogisticLoss,
+                    'SquareLoss': SquareLoss,
+                }
+                loss_class = loss_map[v['class']]
+                setattr(obj, k, loss_class.from_dict(v))
+            else:
+                setattr(obj, k, v)
+        return obj
 
     def fit(self, data: pd.DataFrame) -> None:
         """
@@ -619,10 +651,11 @@ class XGBoostClassifier(BaseXGB):
         try:
             self._federation = None
             self._mpc_engine = None
-            with open(model_path, 'wb') as f:
-                pickle.dump(self, f)
+            json_str = json.dumps(self.to_dict())
+            with open(model_path, 'w') as f:
+                f.write(json_str)
             self.logger.info("Save model success")
-        except pickle.PickleError as e:
+        except json.JSONDecodeError as e:
             self.logger.error(f"Save model file. err={e}")
 
     def load_model(self, model_path: str) -> None:
@@ -634,21 +667,20 @@ class XGBoostClassifier(BaseXGB):
         model_path: string
            File path of the saved model
 
-        Returns
-        -------
-        loadobj: model
-            Saved XGboost model
         """
         try:
-            with open(model_path, 'rb') as f:
-                load_obj = pickle.load(f)
+            with open(model_path, 'r') as f:
+                load_obj = json.load(f)
+            load_attributes = self.from_dict(load_obj)
 
-            self.learning_rate = load_obj.learning_rate
-            self.base_score = load_obj.base_score
-            self.trees = load_obj.trees
+            for attr in vars(self):
+                if attr not in ['logger', '_federation', '_mpc_engine']:
+                    setattr(self, attr, getattr(load_attributes, attr))
+
             self.load_tree_from_numpy_to_ss(self.trees)
             self.logger.info("Load model success")
-        except pickle.PickleError as e:
+
+        except json.JSONDecodeError as e:
             self.logger.error(f"Load model fail. err={e}")
 
 
@@ -746,6 +778,27 @@ class XGBoostRegressor(BaseXGB):
         self.objective = objective
         self.trees = []
         self.loss_func = LogisticLoss()
+
+    def to_dict(self):
+        result = vars(self).copy()
+        del result['logger']
+        result['trees'] = [tree.to_dict() for tree in self.trees]
+        result['loss_func'] = self.loss_func.to_dict()
+        return result
+
+    @classmethod
+    def from_dict(cls, data):
+        obj = cls()
+        for k, v in data.items():
+            if k == 'trees':
+                setattr(obj, k, [MPCTree.from_dict(tree_dict) for tree_dict in v])
+            elif k == 'loss_func':
+                loss_map = {'LogisticLoss': LogisticLoss, 'SquareLoss': SquareLoss}
+                loss_class = loss_map[v['class']]
+                setattr(obj, k, loss_class.from_dict(v))
+            else:
+                setattr(obj, k, v)
+        return obj
 
     def fit(self, data: pd.DataFrame) -> None:
         """
@@ -846,10 +899,11 @@ class XGBoostRegressor(BaseXGB):
         try:
             self._federation = None
             self._mpc_engine = None
-            with open(model_path, 'wb') as f:
-                pickle.dump(self, f)
+            json_str = json.dumps(self.to_dict())
+            with open(model_path, 'w') as f:
+                f.write(json_str)
             self.logger.info("Save model success")
-        except pickle.PickleError as e:
+        except json.JSONDecodeError as e:
             self.logger.error(f"Save model file. err={e}")
 
     def load_model(self, model_path: str) -> None:
@@ -860,20 +914,18 @@ class XGBoostRegressor(BaseXGB):
         ----------
         model_path: string
            File path of the saved model
-
-        Returns
-        -------
-        loadobj: model
-            Saved XGboost model
         """
         try:
-            with open(model_path, 'rb') as f:
-                load_obj = pickle.load(f)
+            with open(model_path, 'r') as f:
+                load_obj = json.load(f)
+            load_attributes = self.from_dict(load_obj)
 
-            self.learning_rate = load_obj.learning_rate
-            self.base_score = load_obj.base_score
-            self.trees = load_obj.trees
+            for attr in vars(self):
+                if attr not in ['logger', '_federation', '_mpc_engine']:
+                    setattr(self, attr, getattr(load_attributes, attr))
+
             self.load_tree_from_numpy_to_ss(self.trees)
             self.logger.info("Load model success")
-        except pickle.PickleError as e:
+
+        except json.JSONDecodeError as e:
             self.logger.error(f"Load model fail. err={e}")

@@ -116,7 +116,7 @@ petml.operators.boosting.XGBoostClassifierFit
 
 | Name | File Type | Description |
 | --- |-----------| --- |
-| model_path | pkl       | The trained model |
+| model_path | json      | The trained model |
 
 #### Examples
 ```
@@ -148,7 +148,7 @@ config = {
             "train_data": "data0.csv",
         },
         "outputs": {
-            "model_path": "model_name0.pkl"
+            "model_path": "model_name0.json"
         }
     },
     "party_b": {
@@ -156,7 +156,7 @@ config = {
             "train_data": "data1.csv",
         },
         "outputs": {
-            "model_path": "model_name1.pkl"
+            "model_path": "model_name1.json"
         }
     }
 }
@@ -176,7 +176,7 @@ petml.operators.boosting.XGBoostClassifierPredict
 | Name         | File Type | Description           |
 |--------------|-----------|-----------------------|
 | predict_data | csv       | The inference dataset |
-| model_path   | pkl       | The trained model     |
+| model_path   | json      | The trained model     |
 
 
 #### Output
@@ -204,7 +204,7 @@ config = {
    "party_a": {
     "inputs": {
         "predict_data": "data0.csv",
-        "model_path": "model_name0.pkl"
+        "model_path": "model_name0.json"
     },
     "outputs": {
         "inference_res_path": "predict0.csv"
@@ -213,7 +213,7 @@ config = {
 "party_b": {
     "inputs": {
         "predict_data": "data1.csv",
-        "model_path": "model_name1.pkl"
+        "model_path": "model_name1.json"
     },
     "outputs": {
         "inference_res_path": "predict1.csv"
@@ -258,7 +258,7 @@ petml.operators.boosting.XGBoostRegressorFit
 
 | Name       | File Type | Description       |
 |------------|-----------|-------------------|
-| model_path | pkl       | The trained model |
+| model_path | json      | The trained model |
 
 #### Examples
 Refer to the examples in classifier training config
@@ -273,7 +273,7 @@ petml.operators.boosting.XGBoostRegressorPredict
 | Name         | File Type | Description           |
 |--------------|-----------|-----------------------|
 | predict_data | csv       | The inference dataset |
-| model_path   | pkl       | The trained model     |
+| model_path   | json      | The trained model     |
 
 
 #### Output

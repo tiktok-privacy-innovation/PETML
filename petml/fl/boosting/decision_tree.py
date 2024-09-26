@@ -56,6 +56,21 @@ class MPCTreeNode:
         self.left_child = left_child
         self.right_child = right_child
 
+    def to_dict(self):
+        """transform object to dict"""
+        return {k: v.to_dict() if isinstance(v, MPCTreeNode) else v for k, v in vars(self).items()}
+
+    @classmethod
+    def from_dict(cls, data):
+        """transform from dict to object"""
+        obj = cls()
+        for k, v in data.items():
+            if isinstance(v, dict):
+                setattr(obj, k, cls.from_dict(v))
+            else:
+                setattr(obj, k, v)
+        return obj
+
 
 class MPCTree:
     """
@@ -120,6 +135,21 @@ class MPCTree:
         self.min_child_samples = min_child_samples
         self.min_split_loss = min_split_loss
         self.max_depth = max_depth
+
+    def to_dict(self):
+        """transform object to dict"""
+        return {k: v.to_dict() if isinstance(v, MPCTreeNode) else v for k, v in vars(self).items()}
+
+    @classmethod
+    def from_dict(cls, data):
+        """transform from dict to object"""
+        obj = cls()
+        for k, v in data.items():
+            if isinstance(v, dict):
+                setattr(obj, k, cls.from_dict(v))
+            else:
+                setattr(obj, k, v)
+        return obj
 
     def _calc_threshold(self, gsum):
         """clip the value of gain"""

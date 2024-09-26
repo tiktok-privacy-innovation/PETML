@@ -25,6 +25,16 @@ class LogisticLoss:
     class for calculate logistic loss function
     """
 
+    def to_dict(self):
+        return {'class': 'LogisticLoss'}
+
+    @classmethod
+    def from_dict(cls, data):
+        if data['class'] == 'LogisticLoss':
+            return cls()
+        else:
+            raise ValueError('Invalid class: ' + data['class'])
+
     def _sigmoid(self, y_pred: np.ndarray):
         """
         Implemented sigmoid equation
@@ -90,8 +100,15 @@ class SquareLoss:
     class for calculate square loss function
     """
 
-    def __init__(self):
-        pass
+    def to_dict(self):
+        return {'class': 'SquareLoss'}
+
+    @classmethod
+    def from_dict(cls, data):
+        if data['class'] == 'SquareLoss':
+            return cls()
+        else:
+            raise ValueError('Invalid class: ' + data['class'])
 
     def grad(self, y_pred: Union[SecureArray, np.ndarray], label: Union[SecureArray, np.ndarray]):
         """
